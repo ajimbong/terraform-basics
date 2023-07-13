@@ -1,0 +1,8 @@
+terraform init
+terraform plan
+terraform apply --auto-approve
+
+terraform state list
+terraform state show {particular_resource_name}
+
+terraform destroy --auto-approve
