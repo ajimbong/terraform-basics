@@ -1,7 +1,7 @@
 # VPC
 resource "aws_vpc" "vpc" {
-  cidr_block       = var.vpc-cidr
-  instance_tenancy = "default"
+  cidr_block           = var.vpc-cidr
+  instance_tenancy     = "default"
   enable_dns_hostnames = true
 
   tags = {
@@ -12,9 +12,9 @@ resource "aws_vpc" "vpc" {
 
 # Subnets
 resource "aws_subnet" "pub-sn1" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.pub-sn1.cidr
-  availability_zone = var.pub-sn1.az
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.pub-sn1.cidr
+  availability_zone       = var.pub-sn1.az
   map_public_ip_on_launch = true
 
   tags = {
@@ -23,9 +23,9 @@ resource "aws_subnet" "pub-sn1" {
 }
 
 resource "aws_subnet" "pub-sn2" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.pub-sn2.cidr
-  availability_zone = var.pub-sn2.az
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.pub-sn2.cidr
+  availability_zone       = var.pub-sn2.az
   map_public_ip_on_launch = true
 
   tags = {
@@ -34,9 +34,9 @@ resource "aws_subnet" "pub-sn2" {
 }
 
 resource "aws_subnet" "prv-sn1" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.prv-sn1.cidr
-  availability_zone = var.prv-sn1.az
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.prv-sn1.cidr
+  availability_zone       = var.prv-sn1.az
   map_public_ip_on_launch = false
 
   tags = {
@@ -45,9 +45,9 @@ resource "aws_subnet" "prv-sn1" {
 }
 
 resource "aws_subnet" "prv-sn2" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.prv-sn2.cidr
-  availability_zone = var.prv-sn2.az
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.prv-sn2.cidr
+  availability_zone       = var.prv-sn2.az
   map_public_ip_on_launch = false
 
   tags = {
@@ -97,12 +97,12 @@ resource "aws_route_table_association" "pub-sn2-rt-assoc" {
 
 # NGW and Public Subnet RT
 resource "aws_eip" "ngw1-eip" {
-  domain   = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 }
 
 resource "aws_eip" "ngw2-eip" {
-  domain   = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 }
 
@@ -136,7 +136,7 @@ resource "aws_route_table" "prv-rt1" {
   vpc_id = aws_vpc.vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.ngw1.id
   }
 
@@ -154,7 +154,7 @@ resource "aws_route_table" "prv-rt2" {
   vpc_id = aws_vpc.vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.ngw2.id
   }
 

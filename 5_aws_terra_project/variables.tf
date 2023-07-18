@@ -67,7 +67,13 @@ variable "ec2-keypair" {
   type    = string
 }
 
+# TODO: Make this loopable in future
 variable "ec2-azs" {
   default = ["us-east-1a", "us-east-1b"]
   type    = list(string)
+}
+
+variable "ssl-cert-arn" {
+  default = "arn:aws:acm:us-east-1:587355757958:certificate/2025c8fe-ce8f-4a3e-ae45-82f9f002698f"
+  type    = string
 }

@@ -1,40 +1,3 @@
-resource "aws_instance" "ec2" {
-  ami           = var.ec2-ami
-  instance_type = var.ec2-instance-type
-
-  #Specify the keypair 
-  #TODO: you want to make this optional if not provided
-  #Keypairs also have to be created b4 time
-  key_name = var.ec2-keypair
-  # VPC, subnet, az
-  vpc_id                 = aws_vpc.vpc.id
-  subnet_id              = aws_subnet.prv-sn1.id
-  availability_zone      = var.ec2-azs[0]
-
-  # Specify security group
-  vpc_security_group_ids = [aws_security_group.webserver-sg.id]
-  # s3 iam role
-  iam_instance_profile = aws_iam_instance_profile.ec2-s3-access-profile.name
-
-  # user data to copy files from s3 bucket
-  user_data = <<-EOF
-    #!/bin/bash 
-    sudo su 
-    yum update -y 
-    yum install httpd -y 
-    chkconfig httpd on 
-    cd /var/www/html 
-    aws s3 sync s3://trust-s3-website /var/www/html 
-    service httpd start
-  EOF
-  # Depend on VPC to be created first
-  #depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw ]
-
-  tags = {
-    Name = "Trust Web Server test"
-  }
-}
-
 ## IAM ec2 s3 access Role
 resource "aws_iam_role" "ec2-s3-iam-role" {
   name = "trust-ec2-s3-access"
@@ -122,19 +85,19 @@ resource "aws_security_group" "webserver-sg" {
   vpc_id      = aws_vpc.vpc.id
 
   ingress {
-    description = "HTTP Access"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    security_groups  = [aws_security_group.alb-sg.id]
+    description     = "HTTP Access"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb-sg.id]
   }
 
   ingress {
-    description = "HTTPS Access"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups  = [aws_security_group.alb-sg.id]
+    description     = "HTTPS Access"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb-sg.id]
   }
 
   egress {
