@@ -77,3 +77,13 @@ variable "ssl-cert-arn" {
   default = "arn:aws:acm:us-east-1:587355757958:certificate/2025c8fe-ce8f-4a3e-ae45-82f9f002698f"
   type    = string
 }
+
+variable "domain-name" {
+  default = "ajimbuilds.click"
+  type = string
+}
+
+variable "record-name" {
+  default = "www"
+  type = string
+}

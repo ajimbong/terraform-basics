@@ -4,6 +4,7 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb-sg.id]
   subnets            = [aws_subnet.pub-sn1.id, aws_subnet.pub-sn2.id]
+  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw, aws_route_table.prv-rt1,  aws_route_table.prv-rt2 ]
 }
 
 resource "aws_lb_target_group" "alb-tg" {
@@ -46,6 +47,7 @@ resource "aws_launch_configuration" "launch-config" {
   instance_type        = var.ec2-instance-type
   security_groups      = [aws_security_group.webserver-sg.id]
   iam_instance_profile = aws_iam_instance_profile.ec2-s3-access-profile.name
+  key_name = var.ec2-keypair
 
   user_data = <<-EOF
     #!/bin/bash 
@@ -68,7 +70,8 @@ resource "aws_autoscaling_group" "asg" {
   health_check_type         = "ELB"
   force_delete              = true
   #wait_for_elb_capacity     = 2
-  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw ]
+  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw, aws_route_table.prv-rt1,  aws_route_table.prv-rt2 ]
+  
 
   # Attaching to target group
   target_group_arns = [aws_lb_target_group.alb-tg.arn]

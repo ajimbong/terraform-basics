@@ -73,7 +73,7 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_route_table" "pub-rt" {
   vpc_id = aws_vpc.vpc.id
-
+  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw ]
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
@@ -99,16 +99,22 @@ resource "aws_route_table_association" "pub-sn2-rt-assoc" {
 resource "aws_eip" "ngw1-eip" {
   domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
+  tags   = {
+    Name = "EIP 1"
+  }
 }
 
 resource "aws_eip" "ngw2-eip" {
   domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
+  tags   = {
+    Name = "EIP 2"
+  }
 }
 
 resource "aws_nat_gateway" "ngw1" {
   allocation_id = aws_eip.ngw1-eip.id
-  subnet_id     = aws_subnet.prv-sn1.id
+  subnet_id     = aws_subnet.pub-sn1.id
 
   tags = {
     Name = "Trust NAT1"
@@ -121,7 +127,7 @@ resource "aws_nat_gateway" "ngw1" {
 
 resource "aws_nat_gateway" "ngw2" {
   allocation_id = aws_eip.ngw2-eip.id
-  subnet_id     = aws_subnet.prv-sn2.id
+  subnet_id     = aws_subnet.pub-sn2.id
 
   tags = {
     Name = "Trust NAT2"
@@ -134,6 +140,7 @@ resource "aws_nat_gateway" "ngw2" {
 
 resource "aws_route_table" "prv-rt1" {
   vpc_id = aws_vpc.vpc.id
+  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw ]
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -151,6 +158,7 @@ resource "aws_route_table_association" "prv-sn1-rt-assoc" {
 }
 
 resource "aws_route_table" "prv-rt2" {
+  depends_on = [ aws_vpc.vpc, aws_nat_gateway.ngw1, aws_nat_gateway.ngw2, aws_internet_gateway.igw ]
   vpc_id = aws_vpc.vpc.id
 
   route {
